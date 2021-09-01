@@ -7,7 +7,7 @@ var bpm = 0
 var notes = []
 var enemyNotes = []
 var songs = [
-    {song: "Dad Battle", path: "./songs/DadBattle_Voices.ogg", songName: "DadBattle", inst: "./songs/DadBattle_Inst.ogg", map: "./maps/test.json"},
+    {song: "Dad Battle", path: "./songs/Dadbattle_Voices.ogg", songName: "DadBattle", inst: "./songs/Dadbattle_Inst.ogg", map: "./maps/test.json"},
     {song: "MILF", path: "./songs/Milf_Voices.ogg", songName: "Milf", inst: "./songs/Milf_Inst.ogg", map: "./maps/milf.json"},
     {song: "Roses", path: "./songs/Roses_Voices.ogg", songName: "Roses", inst: "./songs/Roses_Inst.ogg", map: "./maps/roses.json"},
     {song: "Best Girl", path: "./songs/BestGirl_Voices.ogg", songName: "Roses", inst: "./songs/BestGirl_Inst.ogg", map: "./maps/BestGirl.json"},
