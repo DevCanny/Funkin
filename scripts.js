@@ -41,6 +41,11 @@ var miss = './images/extras/shit'
 var changingKey = false
 var selectedChangingKey = 0
 var selectedToChangeKey = false
+var sicks = 0
+var goods = 0
+var bads = 0
+var misses = 0
+var accuracy = 0
 // arrowPos
 var ArrowHeight = 10
 var LeftPosition = 700
@@ -96,12 +101,12 @@ var selectedArrowWidth = ((canvasWidth / 2) / 1.5) - 100
 // SCRIPTS
 sampleSong.src = "./songs/freakyMenu.ogg"
 sampleSong.play()
+sampleSong.loop = true
 // DATA
 // var data = localStorage
 // var dataKey = "KeyCodes"
 // if(data.getItem(dataKey)){
 // var foundKeyData = data.getItem(dataKey)
-// console.log(foundKeyData.split(","))
 //     // secondaryLeft = foundKeyData[0]
 //     // secondaryDown = foundKeyData[1]
 //     // secondaryUp = foundKeyData[2]
@@ -109,7 +114,6 @@ sampleSong.play()
 // } else {
 //     var tableToSave = ["A", "S", "W", "D"]
 //     data.setItem(dataKey, tableToSave)
-//     console.log(tableToSave)
 // }
 // functions
 function createSound(soundPath){
@@ -135,9 +139,11 @@ function createArrow(arrow){
     newArrow.src = arrow + ".png"
     return newArrow
 }
-function PushNotes(el, HTMLNote, postion, table){
+function PushNotes(el, HTMLNote, postion, table, speed, bpm){
     el.sectionNotes.forEach(el => {
         if(el[1] != null){
+            var deltaTime = 0
+            deltaTime = canvasHeight * speed
             if(table == notes){
                 if(el[1] == 2){
                     postion = UpPosition
@@ -178,7 +184,7 @@ function PushNotes(el, HTMLNote, postion, table){
             }
             setTimeout(function(){
                 table.push(toPush)
-            }, el[0])
+            }, el[0] - deltaTime / bpm)
         }
     })
 }
@@ -191,21 +197,30 @@ function loadmap(map){
             var postion = 0
             var HTMLNote = ""
             var speed = 1
-            // console.log(el.bpm / 10)
-            // console.log(el.speed)
+            var stuff = 0
+            stuff = el.bpm / 60
+            bpm = el.bpm / 60
+            bpm = (bpm * speed * (canvasHeight /el.bpm))
+            var songBPM = el.bpm
             speed = el.speed
             el.notes.forEach(el => {
-                bpm = el.bpm / 60
-                bpm = (bpm * speed) * (canvasHeight /el.bpm) // multiply by Time.deltaTime which I have no idea what the hell that is
+                if(el.bpm != null){
+                    stuff = el.bpm / 60
+                    bpm = el.bpm / 60
+                    bpm = (bpm * speed * (canvasHeight /el.bpm))
+                }
                 if(el.mustHitSection == true){
-                    PushNotes(el, HTMLNote, postion, notes)
+                    PushNotes(el, HTMLNote, postion, notes, stuff, songBPM)
                 } else {
-                    PushNotes(el, HTMLNote, postion, enemyNotes)
+                    PushNotes(el, HTMLNote, postion, enemyNotes, stuff, songBPM)
                 }
             })
-            // console.log(bpm)
         })
     })
+}
+function ready(){
+    songInst.play()
+    songVoice.play()
 }
 function playSong(song, inst) {
     if(songInst.src !== inst){
@@ -214,8 +229,8 @@ function playSong(song, inst) {
     if(songVoice.src !== song){
         songVoice.src = songs[selectedSong].path
     }
-    songInst.play()
-    songVoice.play()
+    ready()
+    // songVoice.addEventListener("DOMContentLoaded", ready)
 } 
 function pauseSong(){
     songVoice.pause()
@@ -235,6 +250,7 @@ function menu() {
 }
 function openfreeplay(){
     status = "menu"
+    selectedMenu = 'freeplay'
     confirmMenu.play()
     selectedArrowHeight = 225
     selectedArrowWidth = ((canvasWidth / 2) / 1.5) - 100
@@ -246,7 +262,6 @@ function options(){
     confirmMenu.play()
     selectedArrowWidth = 0
     selectedArrowHeight = 25
-    // console.log("ah")
     status = "options"
 }
 function changeOption(key){
@@ -287,10 +302,8 @@ function differentScroll(width, height, amount, count, change){
     if (amount == "up"){
         if(selectedSong == 0){
             selectedSong = 0
-            // console.log("fart")
         } else {
             selectedSong -= 1
-            // console.log("fart1")
         }
     } else {
         if(change == selectedSong + 1){
@@ -298,13 +311,10 @@ function differentScroll(width, height, amount, count, change){
             selectedArrowWidth = width
             selectedArrowHeight = height
             // height = 25
-            // console.log("fart2")
         } else {
             selectedSong = selectedSong + 1
-            // console.log("fart3")
         }
     }
-    // console.log(change)
 }
 function scrollThroughSong(width, height, amount){
     differentScroll(width, height, amount, maxSongs, selectedSong)
@@ -334,15 +344,20 @@ function regiterHit(el, point, goodstuff){
     changeScore(point, goodstuff)
     return
 }
+function calculateAccuracy(){
+    
+}
 function hit(key){
     if(clicked[key] == false){
         clicked[key] = true
         notes.forEach(el => {
             if(key == el.typeOfArrow){
-                if(el.validtohit == "sick"){
-                    regiterHit(el, 50, sick)
-                } else if(el.validtohit == "good"){
-                    regiterHit(el, 25, good)
+                if(el.hit == false){
+                    if(el.validtohit == "sick"){
+                        regiterHit(el, 50, sick)
+                    } else if(el.validtohit == "good"){
+                        regiterHit(el, 25, good)
+                    }
                 }
             }
         })
@@ -366,7 +381,6 @@ document.addEventListener("keydown", e => {
                             selectedArrowHeight -= 100
                             selectedChangingKey -= 1
                         }
-                        console.log(selectedChangingKey)
                     } else {
                         scrollThroughOptions(selectedArrowWidth, selectedArrowHeight + 75, "up")
                     }
@@ -391,7 +405,6 @@ document.addEventListener("keydown", e => {
                             selectedArrowHeight += 100
                             selectedChangingKey += 1
                         }
-                        console.log(selectedChangingKey)
                     } else {
                         scrollThroughOptions(selectedArrowWidth, selectedArrowHeight + 75, "down")
                     }
@@ -414,14 +427,13 @@ document.addEventListener("keydown", e => {
         } else if (e.keyCode == 27) {
             if(changingKey == false){
                 if(status == "options" || status == "freeplay"){
-                    openfreeplay()
-                } else {
                     if (midSong == true) {
                         if(gamePaused == false){
                             gamePaused = true
                             pauseSong()
-                            pauseSong()
                         }
+                    } else {
+                        openfreeplay()
                     }
                 }
             } else {
@@ -450,7 +462,6 @@ document.addEventListener("keyup", e => {
 })
 
 document.addEventListener("keypress", e => {
-    // console.log(e.keyCode)
     if (e.keyCode == enter) {
         if (status == "menu") {
             if(selectedMenu == "options"){
@@ -462,6 +473,8 @@ document.addEventListener("keypress", e => {
             freeplay()
             if(gamePaused == false && midSong == false){
                 selectSong()
+            } else {
+                ready()
             }
         } else if(status == "options"){
             if(selectedOption == 0){
@@ -536,7 +549,10 @@ function update() {
         if (midSong == true) {
             // EXTRA
             // ctx.drawImage(MapBG,2560,1400,2560,1400,0,0,canvasWidth,canvasHeight)
-            ctx.fillText("SCORE: " + score, 0, canvasHeight - 5, canvasWidth, 5)
+            ctx.font = "bold 30px Helvetica, Arial, sans-serif"
+            ctx.fillText("SCORE: " + score, 0, canvasHeight - 5, canvasWidth)
+            ctx.fillText("MISSES: " + misses, 250, canvasHeight - 5, canvasWidth)
+            ctx.fillText("ACCURACY: " + accuracy +"%", 500, canvasHeight - 5, canvasWidth)
             // ctx.drawImage(bfSprite, 0, 2344, 406, 392, bfXPos ,bfYPos, bfXSize, bfYSize)
             // ctx.drawImage(dadSprite, 1369, 730, 429, 767, dadXPos ,dadYPos, dadXSize, dadYSize)
             //YOUR ARROWS
