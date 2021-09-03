@@ -560,10 +560,10 @@ document.addEventListener("keypress", e => {
     }
 })
 songInst.onended = function(){
-    sampleSong = "./songs/freakyMenu.ogg"
+    menu()
+    sampleSong.src = "./songs/freakyMenu.ogg"
     selectedSong = 0
     sampleSong.play()
-    menu()
 }
 document.addEventListener('visibilitychange', function() {
 	if(document.hidden){
