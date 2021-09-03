@@ -555,6 +555,9 @@ document.addEventListener("keypress", e => {
     }
 })
 songInst.onended = function(){
+    sampleSong = "./songs/freakyMenu.ogg"
+    selectedSong = 0
+    sampleSong.play()
     menu()
 }
 document.addEventListener('visibilitychange', function() {
