@@ -347,7 +347,7 @@ function scrollThroughSong(width, height, amount){
     sampleSong.src = songs[selectedSong].inst
     sampleSong.play()
     sampleVoice.src = songs[selectedSong].path
-    sampleVoice.muted = true
+    // sampleVoice.muted = true
     sampleVoice.play()
 }
 function scrollThroughOptions(width, height, amount){
