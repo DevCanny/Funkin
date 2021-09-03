@@ -84,6 +84,7 @@ canvas.height = canvasHeight
 var songInst = new Audio()
 var songVoice = new Audio()
 var sampleSong = new Audio()
+var sampleVoice = new Audio()
 // sounds
 var intro1 = new Audio()
 intro1.src = "./sounds/intro1.ogg"
@@ -338,7 +339,6 @@ function differentScroll(width, height, amount){
         }
     }
 }
-var sampleVoice = new Audio
 function scrollThroughSong(width, height, amount){
     differentScroll(width, height, amount)
     scrollMenu.pause()
