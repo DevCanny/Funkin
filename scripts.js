@@ -297,6 +297,7 @@ function changeOption(key){
 function selectSong() {
     midSong = true
     sampleSong.pause()
+    sampleVoice.pause()
     // intro3.play()
     // setTimeout(function(){
     //     intro2.play()
