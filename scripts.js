@@ -108,6 +108,7 @@ var selectedArrowWidth = ((canvasWidth / 2) / 1.5) - 100
 window.addEventListener("load", function(){
     for(var i = 0; i < songs.length; i++){
         loadSong.src = songs[i].path
+        loadSong.src = songs[i].inst
         fetch(songs[i].map)
         .then(response => response.json())
         .then(json => {})
@@ -599,9 +600,9 @@ var arrowSizeX = 100
 function update() {
     ctx.clearRect(0, 0, canvas.width, canvas.height)
     requestAnimationFrame(update)
+    ctx.font = "bold 75px Helvetica, Arial, sans-serif"
     if (status == "menu") {
         ctx.drawImage(bg, 0, 0, canvasWidth, canvasHeight)
-        ctx.font = "bold 75px Helvetica, Arial, sans-serif"
         ctx.fillStyle = "white"
         ctx.fillText("FREEPLAY",(canvasWidth / 2) / 1.5,300)
         ctx.fillText("OPTIONS",((canvasWidth / 2) / 1.5) + 25,450)
@@ -612,7 +613,17 @@ function update() {
             ctx.font = "bold 30px Helvetica, Arial, sans-serif"
             ctx.fillText("SCORE: " + score, 0, canvasHeight - 5, canvasWidth)
             ctx.fillText("MISSES: " + misses, 250, canvasHeight - 5, canvasWidth)
-            ctx.fillText("ACCURACY: " + accuracy +"%", 500, canvasHeight - 5, canvasWidth)
+            if(accuracy >= 95){
+                ctx.fillText("ACCURACY: " + accuracy +"%(S)", 500, canvasHeight - 5, canvasWidth)
+            } else if(accuracy >= 85){
+                ctx.fillText("ACCURACY: " + accuracy +"%(A)", 500, canvasHeight - 5, canvasWidth)
+            } else if(accuracy >= 75){
+                ctx.fillText("ACCURACY: " + accuracy +"%(B)", 500, canvasHeight - 5, canvasWidth)
+            } else if(accuracy >= 60){
+                ctx.fillText("ACCURACY: " + accuracy +"%(C)", 500, canvasHeight - 5, canvasWidth)
+            } else {
+                ctx.fillText("ACCURACY: " + accuracy +"%", 500, canvasHeight - 5, canvasWidth)
+            }
             // ctx.drawImage(bfSprite, 0, 2344, 406, 392, bfXPos ,bfYPos, bfXSize, bfYSize)
             // ctx.drawImage(dadSprite, 1369, 730, 429, 767, dadXPos ,dadYPos, dadXSize, dadYSize)
             //YOUR ARROWS
