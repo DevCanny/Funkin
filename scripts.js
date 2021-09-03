@@ -1,16 +1,20 @@
 // VARIABLES
 // canvas settings
-var canvasWidth = 1200
-var canvasHeight = 600
+var canvasWidth = 1280
+var canvasHeight = 720
 var score = 0
 var bpm = 0
 var notes = []
 var enemyNotes = []
+var loadSong = new Audio()
 var songs = [
     {song: "Dad Battle", path: "./songs/Dadbattle_Voices.ogg", songName: "DadBattle", inst: "./songs/Dadbattle_Inst.ogg", map: "./maps/test.json"},
     {song: "MILF", path: "./songs/Milf_Voices.ogg", songName: "Milf", inst: "./songs/Milf_Inst.ogg", map: "./maps/milf.json"},
     {song: "Roses", path: "./songs/Roses_Voices.ogg", songName: "Roses", inst: "./songs/Roses_Inst.ogg", map: "./maps/roses.json"},
     {song: "Best Girl", path: "./songs/BestGirl_Voices.ogg", songName: "Roses", inst: "./songs/BestGirl_Inst.ogg", map: "./maps/BestGirl.json"},
+    {song: "Mass Homicide(Genocide)", path: "./songs/Genocide_Voices.ogg", songName: "Roses", inst: "./songs/Genocide_Inst.ogg", map: "./maps/Genocide.json"},
+    // {song: "First Town", path: "./songs/FirstTown_Voices.ogg", songName: "Roses", inst: "./songs/FirstTown_Inst.ogg", map: "./maps/FirstTown.json"},
+    // {song: "???", path: "./songs/Ghost_Voices.ogg", songName: "Roses", inst: "./songs/Ghost_Inst.ogg", map: "./maps/Ghost.json"},
 ]
 var optionsList = [
     "KeyBinds"
@@ -99,9 +103,18 @@ var ClickingDown = false
 var selectedArrowHeight = 225
 var selectedArrowWidth = ((canvasWidth / 2) / 1.5) - 100
 // SCRIPTS
-sampleSong.src = "./songs/freakyMenu.ogg"
-sampleSong.play()
-sampleSong.loop = true
+//LOAD STUFF
+window.addEventListener("load", function(){
+    for(var i = 0; i < songs.length; i++){
+        loadSong.src = songs[i].path
+        fetch(songs[i].map)
+        .then(response => response.json())
+        .then(json => {})
+    }
+    sampleSong.src = "./songs/freakyMenu.ogg"
+    sampleSong.play()
+    sampleSong.loop = true
+})
 // DATA
 // var data = localStorage
 // var dataKey = "KeyCodes"
@@ -134,16 +147,21 @@ function changeKey(key, lol){
         }
     }
 }
+//ADD HEALTH SYSTEM?
 function createArrow(arrow){
     let newArrow = new Image
     newArrow.src = arrow + ".png"
     return newArrow
 }
-function PushNotes(el, HTMLNote, postion, table, speed, bpm){
+function PushNotes(el, HTMLNote, postion, table, speed, bpm, songSpeed){
     el.sectionNotes.forEach(el => {
         if(el[1] != null){
             var deltaTime = 0
-            deltaTime = canvasHeight * speed
+            var secPerBeat = 0
+            deltaTime = (canvasHeight * speed) * songSpeed
+            var dsptimesong = Audio.dsp
+            var songPosition = Audio.dsp - dsptimesong
+            var songPosInBeats = songPosition / secPerBeat
             if(table == notes){
                 if(el[1] == 2){
                     postion = UpPosition
@@ -159,16 +177,16 @@ function PushNotes(el, HTMLNote, postion, table, speed, bpm){
                     HTMLNote = "./arrows/colored/Right"
                 }
             } else {
-                if(el[1] == 2){
+                if(el[1] == 2 || el[1] == 6){
                     postion = EnemyUpPosition
                     HTMLNote = "./arrows/colored/Up"
-                } else if(el[1] == 1){
+                } else if(el[1] == 1 || el[1] == 5){
                     postion = EnemyDownPosition
                     HTMLNote = "./arrows/colored/Down"
-                } else if(el[1] == 0){
+                } else if(el[1] == 0 || el[1] == 4){
                     postion = EnemyLeftPosition
                     HTMLNote = "./arrows/colored/Left"
-                } else if(el[1] == 3){
+                } else if(el[1] == 3 || el[1] == 7){
                     postion = EnemyRightPosition
                     HTMLNote = "./arrows/colored/Right"
                 }
@@ -184,7 +202,7 @@ function PushNotes(el, HTMLNote, postion, table, speed, bpm){
             }
             setTimeout(function(){
                 table.push(toPush)
-            }, el[0] - deltaTime / bpm)
+            }, el[0] - deltaTime / (speed * 10))
         }
     })
 }
@@ -198,21 +216,21 @@ function loadmap(map){
             var HTMLNote = ""
             var speed = 1
             var stuff = 0
-            stuff = el.bpm / 60
-            bpm = el.bpm / 60
-            bpm = (bpm * speed * (canvasHeight /el.bpm))
-            var songBPM = el.bpm
             speed = el.speed
+            stuff = (el.bpm / 60) * speed
+            bpm = el.bpm / 60
+            bpm = (bpm * (canvasHeight / el.bpm) * speed)
+            var songBPM = el.bpm
             el.notes.forEach(el => {
                 if(el.bpm != null){
                     stuff = el.bpm / 60
                     bpm = el.bpm / 60
-                    bpm = (bpm * speed * (canvasHeight /el.bpm))
+                    bpm = (bpm * speed * (canvasHeight / el.bpm))
                 }
                 if(el.mustHitSection == true){
-                    PushNotes(el, HTMLNote, postion, notes, stuff, songBPM)
+                    PushNotes(el, HTMLNote, postion, notes, stuff, songBPM, speed)
                 } else {
-                    PushNotes(el, HTMLNote, postion, enemyNotes, stuff, songBPM)
+                    PushNotes(el, HTMLNote, postion, enemyNotes, stuff, songBPM, speed)
                 }
             })
         })
@@ -298,7 +316,7 @@ function scroll(status, width, height){
     selectedArrowHeight = height
     selectedArrowWidth = width
 }
-function differentScroll(width, height, amount, count, change){
+function differentScroll(width, height, amount){
     if (amount == "up"){
         if(selectedSong == 0){
             selectedSong = 0
@@ -306,7 +324,7 @@ function differentScroll(width, height, amount, count, change){
             selectedSong -= 1
         }
     } else {
-        if(change == selectedSong + 1){
+        if(selectedSong == selectedSong + 1){
             change = 0
             selectedArrowWidth = width
             selectedArrowHeight = height
@@ -317,7 +335,7 @@ function differentScroll(width, height, amount, count, change){
     }
 }
 function scrollThroughSong(width, height, amount){
-    differentScroll(width, height, amount, maxSongs, selectedSong)
+    differentScroll(width, height, amount)
     scrollMenu.pause()
     scrollMenu.play()
     selectedArrowHeight = height
@@ -328,14 +346,33 @@ function scrollThroughSong(width, height, amount){
 function scrollThroughOptions(width, height, amount){
     differentScroll(width, height, amount, optionsList.length, selectedOption)
 }
+function calculateAccuracy(){
+    var accuracyPoints = 0
+    accuracyPoints += (sicks * 100)
+    accuracyPoints += (goods * 75)
+    accuracyPoints += (bads * 75)
+    accuracyPoints += (misses * 25)
+    var hits = (sicks + goods + bads + misses)
+    accuracy = Math.floor(accuracyPoints / hits)
+}
 function changeScore(number, text){
     score += number
+    if(text == sick){
+        sicks += 1
+    } else if(text == good){
+        goods += 1
+    } else if(text == bad){
+        bads += 1
+    } else {
+        misses += 1
+    }
     var gah = createArrow(text)
     var toPush = {
         'image': gah,
         'time': 1000,
     }
     cools.push(toPush)
+    calculateAccuracy()
 }
 var clicked = [false,false,false,false]
 function regiterHit(el, point, goodstuff){
@@ -343,9 +380,6 @@ function regiterHit(el, point, goodstuff){
     // notes[el] = null
     changeScore(point, goodstuff)
     return
-}
-function calculateAccuracy(){
-    
 }
 function hit(key){
     if(clicked[key] == false){
@@ -357,6 +391,8 @@ function hit(key){
                         regiterHit(el, 50, sick)
                     } else if(el.validtohit == "good"){
                         regiterHit(el, 25, good)
+                    } else if(el.validtohit == "bad"){
+                        regiterHit(el, 10, bad)
                     }
                 }
             }
@@ -382,7 +418,7 @@ document.addEventListener("keydown", e => {
                             selectedChangingKey -= 1
                         }
                     } else {
-                        scrollThroughOptions(selectedArrowWidth, selectedArrowHeight + 75, "up")
+                        // scrollThroughOptions(selectedArrowWidth, selectedArrowHeight + 75, "up")
                     }
                 } else {
                     if(selectedMenu == "options"){
@@ -406,7 +442,7 @@ document.addEventListener("keydown", e => {
                             selectedChangingKey += 1
                         }
                     } else {
-                        scrollThroughOptions(selectedArrowWidth, selectedArrowHeight + 75, "down")
+                        // scrollThroughOptions(selectedArrowWidth, selectedArrowHeight + 75, "down")
                     }
                 } else {
                     if(selectedMenu == "freeplay"){
@@ -592,10 +628,12 @@ function update() {
                         changeScore(-50, miss)
                     }
                 }
-                else if(el.height <= 25){
+                else if(el.height <= 15){
                     el.validtohit = "sick"
-                } else if(el.height <= 50){
+                } else if(el.height <= 30){
                     el.validtohit = "good"
+                } else if(el.height <= 50){
+                    el.validtohit = "bad"
                 } else {
                     el.validtohit = "no"
                 }
