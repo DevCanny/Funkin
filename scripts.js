@@ -19,6 +19,7 @@ var songs = [
 var optionsList = [
     "KeyBinds"
 ]
+var splashes = []
 var cools = []
 var autoplay = false
 // settings
@@ -322,15 +323,16 @@ function differentScroll(width, height, amount){
             selectedSong = 0
         } else {
             selectedSong -= 1
-        }
-    } else {
-        if(selectedSong == selectedSong + 1){
-            change = 0
             selectedArrowWidth = width
             selectedArrowHeight = height
-            // height = 25
+        }
+    } else {
+        if(maxSongs == selectedSong + 1){
+            
         } else {
             selectedSong = selectedSong + 1
+            selectedArrowWidth = width
+            selectedArrowHeight = height
         }
     }
 }
@@ -338,8 +340,8 @@ function scrollThroughSong(width, height, amount){
     differentScroll(width, height, amount)
     scrollMenu.pause()
     scrollMenu.play()
-    selectedArrowHeight = height
-    selectedArrowWidth = width
+    // selectedArrowHeight = height
+    // selectedArrowWidth = width
     sampleSong.src = songs[selectedSong].inst
     sampleSong.play()
 }
@@ -370,15 +372,37 @@ function changeScore(number, text){
     var toPush = {
         'image': gah,
         'time': 1000,
+        'height': 300,
     }
     cools.push(toPush)
     calculateAccuracy()
 }
 var clicked = [false,false,false,false]
-function regiterHit(el, point, goodstuff){
+function regiterHit(el, point, goodstuff, type){
     el.hit = true
     // notes[el] = null
     changeScore(point, goodstuff)
+    if(goodstuff == sick){
+        var toPush = {
+            "width": 0,
+            'time': 100,
+            'img': "",
+        }
+        if(type==0){
+            toPush.width = LeftPosition - 10
+            toPush.img = createArrow("./arrows/hit/SplashLeft")
+        } else if(type ==1){
+            toPush.width = DownPosition - 10
+            toPush.img = createArrow("./arrows/hit/SplashDown")
+        } else if(type == 2){
+            toPush.width = UpPosition - 10
+            toPush.img = createArrow("./arrows/hit/SplashUp")
+        } else {
+            toPush.width = RightPosition - 10
+            toPush.img = createArrow("./arrows/hit/SplashRight")
+        }
+        splashes.push(toPush)
+    }
     return
 }
 function hit(key){
@@ -388,7 +412,7 @@ function hit(key){
             if(key == el.typeOfArrow){
                 if(el.hit == false){
                     if(el.validtohit == "sick"){
-                        regiterHit(el, 50, sick)
+                        regiterHit(el, 50, sick, el.typeOfArrow)
                     } else if(el.validtohit == "good"){
                         regiterHit(el, 25, good)
                     } else if(el.validtohit == "bad"){
@@ -644,9 +668,7 @@ function update() {
             enemyNotes.forEach(el => {
                 el.height-=bpm
                 if(el.height <= 0){
-                    if(el.hit != true){
-                        el.hit = true
-                    }
+                    
                 } else {
                     ctx.drawImage(el.note,el.postion,el.height,100,100)
                 }
@@ -654,8 +676,20 @@ function update() {
             // HIT HANDLER
             cools.forEach(el => {
                 if(el.time >= 0){
+                    el.time -= 50
+                    ctx.drawImage(el.image, 425, el.height, 150, 100)
+                    el.height-=5
+                } else {
+                    el = null
+                }
+            })
+            //SPLASHES
+            splashes.forEach(el => {
+                if(el.time >= 0){
                     el.time -= 10
-                    ctx.drawImage(el.image, 425, 300, 150, 100)
+                    ctx.drawImage(el.img, el.width, ArrowHeight, arrowSizeX, arrowSizeY)
+                } else {
+                    el = null
                 }
             })
         } else {
