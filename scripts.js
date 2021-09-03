@@ -698,8 +698,6 @@ function update() {
                     el.time -= 50
                     ctx.drawImage(el.image, 425, el.height, 150, 100)
                     el.height-=5
-                } else {
-                    el = null
                 }
             })
             //SPLASHES
@@ -707,8 +705,6 @@ function update() {
                 if(el.time >= 0){
                     el.time -= 10
                     ctx.drawImage(el.img, el.width, ArrowHeight, arrowSizeX, arrowSizeY)
-                } else {
-                    el = null
                 }
             })
         } else {
