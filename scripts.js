@@ -337,6 +337,7 @@ function differentScroll(width, height, amount){
         }
     }
 }
+var sampleVoice = new Audio
 function scrollThroughSong(width, height, amount){
     differentScroll(width, height, amount)
     scrollMenu.pause()
@@ -345,6 +346,9 @@ function scrollThroughSong(width, height, amount){
     // selectedArrowWidth = width
     sampleSong.src = songs[selectedSong].inst
     sampleSong.play()
+    sampleVoice.src = songs[selectedSong].path
+    sampleVoice.muted = true
+    sampleVoice.play()
 }
 function scrollThroughOptions(width, height, amount){
     differentScroll(width, height, amount, optionsList.length, selectedOption)
